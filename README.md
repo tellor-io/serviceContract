@@ -9,3 +9,4 @@ Contract to pay Tellor reporters on Polygon.
 
 ## next features
 1. create new terms function (takes three params: a new time period, new total rewards, new addresses whitelist)
+2. switchable tellor oracle address
