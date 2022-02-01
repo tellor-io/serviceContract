@@ -1,19 +1,29 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("Greeter", function () {
-  it("Should return the new greeting once it's changed", async function () {
-    const Greeter = await ethers.getContractFactory("Greeter");
-    const greeter = await Greeter.deploy("Hello, world!");
-    await greeter.deployed();
+describe("serviceContract", function () {
+  it("Testing service contract", async function () {
+    // test vars
+    let days = 10;
+    let newDays = 20;
 
-    expect(await greeter.greet()).to.equal("Hello, world!");
+    // deploy
+    const serviceContract = await ethers.getContractFactory("serviceContract");
+    const testContract = await serviceContract.deploy(days);
+    await testContract.deployed();
 
-    const setGreetingTx = await greeter.setGreeting("Hola, mundo!");
+    // confirm constructor input
+    expect(await testContract.howLongReportPeriod()).to.equal(days);
 
-    // wait until the transaction is mined
-    await setGreetingTx.wait();
+    // test changing reporting time period
+    const setReportingPeriodTx = await testContract.setReportingPeriod(newDays);
+    await setReportingPeriodTx.wait();
+    expect(await testContract.howLongReportPeriod()).to.equal(newDays);
 
-    expect(await greeter.greet()).to.equal("Hola, mundo!");
+    // test adding reporter to whitelist
+    const addr1 = ethers.Wallet.createRandom()
+    const addReporterTx = await testContract.addReporter(addr1.address);
+    await addReporterTx.wait()
+    expect(await testContract.isReporter(addr1.address)).to.equal(true);
   });
 });
